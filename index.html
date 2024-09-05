@@ -42,7 +42,7 @@
     </div>
 
     <script>
-        const xmlUrl = 'https://www.bnr.ro/nbrfxrates.xml';
+        const xmlUrl = 'nbrfxrates.xml';
         let exchangeRates = {
             RON: 1,
             EUR: null,
@@ -50,9 +50,13 @@
         };
 
         // Fetch the exchange rates from the BNR XML
+        // Fetch the exchange rates from the local XML file
         async function fetchExchangeRates() {
             try {
                 const response = await fetch(xmlUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
                 const xmlText = await response.text();
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "text/xml");
@@ -61,7 +65,7 @@
                 for (let i = 0; i < rates.length; i++) {
                     const currency = rates[i].getAttribute('currency');
                     const rateValue = parseFloat(rates[i].textContent);
-                    
+
                     if (currency === 'EUR') {
                         exchangeRates.EUR = rateValue;
                     } else if (currency === 'USD') {
