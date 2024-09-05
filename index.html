@@ -16,7 +16,7 @@
         .form-group select {
             margin-right: 10px;
         }
-        #toAmount {
+        .form-group input[readonly] {
             background-color: #f0f0f0; /* Make read-only field distinct */
         }
     </style>
@@ -33,7 +33,7 @@
         </div>
 
         <div class="form-group">
-            <input type="number" id="toAmount" value="" min="0" readonly />
+            <input type="number" id="toAmount" value="" min="0" />
             <select id="toCurrency">
                 <option value="RON">RON</option>
                 <option value="EUR">EUR</option>
@@ -95,7 +95,7 @@
 
         // Update conversion based on input values
         function updateConversion(sourceField) {
-            const fromAmount = parseFloat(document.getElementById('fromAmount').value);
+            const fromAmount = parseFloat(document.getElementById('fromAmount').value) || 0;
             const fromCurrency = document.getElementById('fromCurrency').value;
             const toCurrency = document.getElementById('toCurrency').value;
             const toAmountField = document.getElementById('toAmount');
@@ -107,7 +107,7 @@
                     toAmountField.value = result;
                 }
             } else if (sourceField === 'to') {
-                const toAmount = parseFloat(toAmountField.value);
+                const toAmount = parseFloat(toAmountField.value) || 0;
                 const result = convertCurrency(toAmount, toCurrency, fromCurrency);
                 if (result !== null) {
                     fromAmountField.value = result;
