@@ -154,12 +154,15 @@
             }
         }
 
-        // Format date to dd-MMM-yyyy
+        // Format date and time to dd-MMM-yyyy hh:mm:ss
         function formatLocalDate(date) {
             const day = String(date.getDate()).padStart(2, '0');
             const month = date.toLocaleString('default', { month: 'short' }); // Short month name (e.g., Jan, Feb)
             const year = date.getFullYear();
-            return `${day}-${month}-${year}`;
+            const hours = String(date.getHours()).padStart(2, '0');
+            const minutes = String(date.getMinutes()).padStart(2, '0');
+            const seconds = String(date.getSeconds()).padStart(2, '0');
+            return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
         }
 
         // Install PWA prompt handling
