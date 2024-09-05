@@ -48,8 +48,7 @@
             EUR: null,
             USD: null
         };
-
-        // Fetch the exchange rates from the BNR XML
+    
         // Fetch the exchange rates from the local XML file
         async function fetchExchangeRates() {
             try {
@@ -60,12 +59,12 @@
                 const xmlText = await response.text();
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-
+    
                 const rates = xmlDoc.getElementsByTagName('Rate');
                 for (let i = 0; i < rates.length; i++) {
                     const currency = rates[i].getAttribute('currency');
                     const rateValue = parseFloat(rates[i].textContent);
-
+    
                     if (currency === 'EUR') {
                         exchangeRates.EUR = rateValue;
                     } else if (currency === 'USD') {
@@ -76,12 +75,12 @@
                 console.error('Error fetching or parsing XML:', error);
             }
         }
-
+    
         // Convert function
         function convertCurrency(amount, fromCurrency, toCurrency) {
             const fromRate = exchangeRates[fromCurrency];
             const toRate = exchangeRates[toCurrency];
-
+    
             if (!fromRate || !toRate) {
                 alert("Exchange rates not available. Please try again later.");
                 return null;
@@ -89,31 +88,31 @@
             const convertedAmount = (amount / fromRate) * toRate;
             return convertedAmount.toFixed(4);
         }
-
+    
         // Event listener for the Convert button
         document.getElementById('convertButton').addEventListener('click', () => {
             const amount = parseFloat(document.getElementById('amount').value);
             const fromCurrency = document.getElementById('fromCurrency').value;
             const toCurrency = document.getElementById('toCurrency').value;
-
+    
             const result = convertCurrency(amount, fromCurrency, toCurrency);
             if (result !== null) {
                 document.getElementById('convertedAmount').textContent = result;
             }
         });
-
+    
         // Fetch exchange rates on window load
         window.onload = fetchExchangeRates;
-
+    
         // Install PWA prompt handling
         let deferredPrompt;
         const installButton = document.getElementById('installButton');
-
+    
         window.addEventListener('beforeinstallprompt', (event) => {
             event.preventDefault();
             deferredPrompt = event;
             installButton.hidden = false;
-
+    
             installButton.addEventListener('click', () => {
                 installButton.hidden = true;
                 deferredPrompt.prompt();
@@ -128,5 +127,6 @@
             });
         });
     </script>
+    
 </body>
 </html>
