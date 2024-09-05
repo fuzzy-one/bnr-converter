@@ -38,8 +38,6 @@
             </select>
         </div>
 
-        <button id="convertButton">Convert</button>
-
         <h2>Converted Amount: <span id="convertedAmount"></span></h2>
 
         <button id="installButton" hidden>Install App</button>
@@ -75,6 +73,7 @@
                         exchangeRates.USD = rateValue;
                     }
                 }
+                updateConversion(); // Update conversion when rates are fetched
             } catch (error) {
                 console.error('Error fetching or parsing XML:', error);
             }
@@ -89,10 +88,26 @@
                 alert("Exchange rates not available. Please try again later.");
                 return null;
             }
-            // Revert to previous logic where conversion formula is applied correctly
             const convertedAmount = (amount * fromRate) / toRate;
             return convertedAmount.toFixed(4);
         }
+
+        // Update conversion based on input values
+        function updateConversion() {
+            const amount = parseFloat(document.getElementById('amount').value);
+            const fromCurrency = document.getElementById('fromCurrency').value;
+            const toCurrency = document.getElementById('toCurrency').value;
+
+            const result = convertCurrency(amount, fromCurrency, toCurrency);
+            if (result !== null) {
+                document.getElementById('convertedAmount').textContent = result;
+            }
+        }
+
+        // Event listeners for real-time conversion
+        document.getElementById('amount').addEventListener('input', updateConversion);
+        document.getElementById('fromCurrency').addEventListener('change', updateConversion);
+        document.getElementById('toCurrency').addEventListener('change', updateConversion);
 
         // Swap currencies function
         function swapCurrencies() {
@@ -102,26 +117,16 @@
             const temp = fromCurrency.value;
             fromCurrency.value = toCurrency.value;
             toCurrency.value = temp;
+
+            updateConversion(); // Update conversion after swapping
         }
-
-        // Event listener for the Convert button
-        document.getElementById('convertButton').addEventListener('click', () => {
-            const amount = parseFloat(document.getElementById('amount').value);
-            const fromCurrency = document.getElementById('fromCurrency').value;
-            const toCurrency = document.getElementById('toCurrency').value;
-
-            const result = convertCurrency(amount, fromCurrency, toCurrency);
-            if (result !== null) {
-                document.getElementById('convertedAmount').textContent = result;
-            }
-        });
 
         // Event listener for the Swap button
         document.getElementById('swapButton').addEventListener('click', swapCurrencies);
 
         // Set default values
-        document.getElementById('fromCurrency').value = 'EUR';
-        document.getElementById('toCurrency').value = 'RON';
+        document.getElementById('fromCurrency').value = 'RON';
+        document.getElementById('toCurrency').value = 'USD';
 
         // Fetch exchange rates on window load
         window.onload = fetchExchangeRates;
