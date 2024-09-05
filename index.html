@@ -89,7 +89,8 @@
                 alert("Exchange rates not available. Please try again later.");
                 return null;
             }
-            const convertedAmount = (amount / fromRate) * toRate;
+            // Revert to previous logic where conversion formula is applied correctly
+            const convertedAmount = (amount * fromRate) / toRate;
             return convertedAmount.toFixed(4);
         }
 
