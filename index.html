@@ -6,18 +6,25 @@
     <title>Currency Converter</title>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
+    <style>
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        .form-group input,
+        .form-group select {
+            margin-right: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>Currency Converter</h1>
 
         <div class="form-group">
-            <label for="amount">Amount:</label>
-            <input type="number" id="amount" value="1" min="0" />
-        </div>
-
-        <div class="form-group">
-            <label for="fromCurrency">From:</label>
+            <label for="fromAmount">From:</label>
+            <input type="number" id="fromAmount" value="1" min="0" />
             <select id="fromCurrency">
                 <option value="RON">RON</option>
                 <option value="EUR">EUR</option>
@@ -26,19 +33,14 @@
         </div>
 
         <div class="form-group">
-            <button id="swapButton">Swap</button>
-        </div>
-
-        <div class="form-group">
-            <label for="toCurrency">To:</label>
+            <label for="toAmount">To:</label>
+            <input type="number" id="toAmount" value="" min="0" readonly />
             <select id="toCurrency">
                 <option value="RON">RON</option>
                 <option value="EUR">EUR</option>
                 <option value="USD">USD</option>
             </select>
         </div>
-
-        <h2>Converted Amount: <span id="convertedAmount"></span></h2>
 
         <button id="installButton" hidden>Install App</button>
     </div>
@@ -93,36 +95,32 @@
         }
 
         // Update conversion based on input values
-        function updateConversion() {
-            const amount = parseFloat(document.getElementById('amount').value);
+        function updateConversion(sourceField) {
+            const fromAmount = parseFloat(document.getElementById('fromAmount').value);
             const fromCurrency = document.getElementById('fromCurrency').value;
             const toCurrency = document.getElementById('toCurrency').value;
+            const toAmountField = document.getElementById('toAmount');
+            const fromAmountField = document.getElementById('fromAmount');
 
-            const result = convertCurrency(amount, fromCurrency, toCurrency);
-            if (result !== null) {
-                document.getElementById('convertedAmount').textContent = result;
+            if (sourceField === 'from') {
+                const result = convertCurrency(fromAmount, fromCurrency, toCurrency);
+                if (result !== null) {
+                    toAmountField.value = result;
+                }
+            } else if (sourceField === 'to') {
+                const toAmount = parseFloat(toAmountField.value);
+                const result = convertCurrency(toAmount, toCurrency, fromCurrency);
+                if (result !== null) {
+                    fromAmountField.value = result;
+                }
             }
         }
 
         // Event listeners for real-time conversion
-        document.getElementById('amount').addEventListener('input', updateConversion);
-        document.getElementById('fromCurrency').addEventListener('change', updateConversion);
-        document.getElementById('toCurrency').addEventListener('change', updateConversion);
-
-        // Swap currencies function
-        function swapCurrencies() {
-            const fromCurrency = document.getElementById('fromCurrency');
-            const toCurrency = document.getElementById('toCurrency');
-
-            const temp = fromCurrency.value;
-            fromCurrency.value = toCurrency.value;
-            toCurrency.value = temp;
-
-            updateConversion(); // Update conversion after swapping
-        }
-
-        // Event listener for the Swap button
-        document.getElementById('swapButton').addEventListener('click', swapCurrencies);
+        document.getElementById('fromAmount').addEventListener('input', () => updateConversion('from'));
+        document.getElementById('fromCurrency').addEventListener('change', () => updateConversion('from'));
+        document.getElementById('toCurrency').addEventListener('change', () => updateConversion('from'));
+        document.getElementById('toAmount').addEventListener('input', () => updateConversion('to'));
 
         // Set default values
         document.getElementById('fromCurrency').value = 'RON';
