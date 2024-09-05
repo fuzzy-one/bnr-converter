@@ -1,28 +1,28 @@
-name: Update XML File
+name: Update Exchange Rates
 
 on:
   schedule:
-    - cron: '0 * * * *' # Every hour
-  workflow_dispatch: # Allows manual triggering
+    - cron: '0 * * * *' # Run every hour
+  workflow_dispatch: # Allow manual triggers
 
 jobs:
-  update:
+  update-rates:
     runs-on: ubuntu-latest
-
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Download XML file
-      run: curl -o nbrfxrates.xml https://www.bnr.ro/nbrfxrates.xml
+      - name: Fetch latest XML data
+        run: |
+          curl -o nbrfxrates.xml https://www.bnr.ro/nbrfxrates.xml
+          date > last-updated.txt
 
-    - name: Update last updated file
-      run: echo "$(date)" > last-updated.txt
-
-    - name: Commit and push changes
-      uses: EndBug/add-and-commit@v9
-      with:
-        author_name: 'GitHub Actions'
-        author_email: 'actions@github.com'
-        message: 'Update nbrfxrates.xml and last-updated.txt'
-        add: 'nbrfxrates.xml, last-updated.txt'
+      - name: Commit and push changes
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git add nbrfxrates.xml last-updated.txt
+          git commit -m "Update exchange rates and last updated timestamp"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
