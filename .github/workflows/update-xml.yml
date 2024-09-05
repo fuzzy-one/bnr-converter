@@ -1,0 +1,25 @@
+name: Update XML File
+
+on:
+  schedule:
+    - cron: '0 * * * *'  # Runs daily at midnight UTC
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  update-xml:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Download XML file
+        run: |
+          curl -o nbrfxrates.xml https://www.bnr.ro/nbrfxrates.xml
+
+      - name: Commit and push changes
+        uses: EndBug/add-and-commit@v9
+        with:
+          add: 'nbrfxrates.xml'
+          message: 'Update XML file with latest rates'
+          author_name: 'github-actions'
+          author_email: 'github-actions@github.com'
