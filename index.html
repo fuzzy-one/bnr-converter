@@ -16,10 +16,10 @@
         .form-group select {
             margin-right: 10px;
         }
-        footer {
+        #footer {
             margin-top: 20px;
-            font-size: 0.9em;
-            color: #555;
+            font-size: 14px;
+            color: #666;
         }
     </style>
 </head>
@@ -44,15 +44,16 @@
         </div>
 
         <button id="installButton" hidden>Install App</button>
-    </div>
 
-    <footer>
-        Last updated: <span id="lastUpdated">Loading...</span>
-    </footer>
+        <div id="footer">
+            Last updated: <span id="lastUpdated"></span>
+        </div>
+    </div>
 
     <script>
         const xmlUrl = 'nbrfxrates.xml';
         const lastUpdatedUrl = 'last-updated.txt';
+
         let exchangeRates = {
             RON: 1,
             EUR: null,
@@ -82,14 +83,6 @@
                     }
                 }
                 updateConversion(); // Update conversion when rates are fetched
-
-                // Fetch and display the last updated date
-                const lastUpdatedResponse = await fetch(lastUpdatedUrl);
-                if (!lastUpdatedResponse.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const lastUpdatedText = await lastUpdatedResponse.text();
-                document.getElementById('lastUpdated').textContent = lastUpdatedText.trim();
             } catch (error) {
                 console.error('Error fetching or parsing XML:', error);
             }
@@ -140,8 +133,31 @@
         document.getElementById('fromCurrency').value = 'EUR';
         document.getElementById('toCurrency').value = 'RON';
 
-        // Fetch exchange rates on window load
-        window.onload = fetchExchangeRates;
+        // Fetch exchange rates and last updated time on window load
+        window.onload = async function() {
+            await fetchExchangeRates();
+            updateLastUpdated();
+        };
+
+        // Fetch and display the last updated time
+        async function updateLastUpdated() {
+            try {
+                const response = await fetch(lastUpdatedUrl);
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const lastUpdatedText = await response.text();
+                const lastUpdatedDate = new Date(lastUpdatedText);
+                document.getElementById('lastUpdated').textContent = formatLocalDate(lastUpdatedDate);
+            } catch (error) {
+                console.error('Error fetching last updated time:', error);
+            }
+        }
+
+        // Format date to local time
+        function formatLocalDate(date) {
+            return date.toLocaleString(); // You can customize this format if needed
+        }
 
         // Install PWA prompt handling
         let deferredPrompt;
