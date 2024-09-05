@@ -2,26 +2,27 @@ name: Update XML File
 
 on:
   schedule:
-    - cron: '0 * * * *'  # Runs every hour at the top of the hour
-  workflow_dispatch:  # Allows manual triggering of the workflow
+    - cron: '0 * * * *' # Every hour
+  workflow_dispatch: # Allows manual triggering
 
 jobs:
-  update-xml:
+  update:
     runs-on: ubuntu-latest
+
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+    - name: Checkout repository
+      uses: actions/checkout@v3
 
-      - name: Download XML file
-        run: |
-          curl -o nbrfxrates.xml https://www.bnr.ro/nbrfxrates.xml
+    - name: Download XML file
+      run: curl -o nbrfxrates.xml https://www.bnr.ro/nbrfxrates.xml
 
-      - name: Commit and push changes
-        run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
-          git add nbrfxrates.xml
-          git commit -m "Update XML file with latest rates" || echo "No changes to commit"
-          git push
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Update last updated file
+      run: echo "$(date)" > last-updated.txt
+
+    - name: Commit and push changes
+      uses: EndBug/add-and-commit@v9
+      with:
+        author_name: 'GitHub Actions'
+        author_email: 'actions@github.com'
+        message: 'Update nbrfxrates.xml and last-updated.txt'
+        add: 'nbrfxrates.xml, last-updated.txt'

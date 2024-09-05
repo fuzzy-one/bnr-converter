@@ -16,6 +16,11 @@
         .form-group select {
             margin-right: 10px;
         }
+        footer {
+            margin-top: 20px;
+            font-size: 0.9em;
+            color: #555;
+        }
     </style>
 </head>
 <body>
@@ -41,8 +46,13 @@
         <button id="installButton" hidden>Install App</button>
     </div>
 
+    <footer>
+        Last updated: <span id="lastUpdated">Loading...</span>
+    </footer>
+
     <script>
         const xmlUrl = 'nbrfxrates.xml';
+        const lastUpdatedUrl = 'last-updated.txt';
         let exchangeRates = {
             RON: 1,
             EUR: null,
@@ -72,6 +82,14 @@
                     }
                 }
                 updateConversion(); // Update conversion when rates are fetched
+
+                // Fetch and display the last updated date
+                const lastUpdatedResponse = await fetch(lastUpdatedUrl);
+                if (!lastUpdatedResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const lastUpdatedText = await lastUpdatedResponse.text();
+                document.getElementById('lastUpdated').textContent = lastUpdatedText.trim();
             } catch (error) {
                 console.error('Error fetching or parsing XML:', error);
             }
