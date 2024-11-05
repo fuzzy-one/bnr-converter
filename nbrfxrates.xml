@@ -2,7 +2,7 @@
 <DataSet xmlns="http://www.bnr.ro/xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.bnr.ro/xsd nbrfxrates.xsd">
 	<Header>
 		<Publisher>National Bank of Romania</Publisher>
-		<PublishingDate>2024-11-04</PublishingDate>
+		<PublishingDate>2024-11-05</PublishingDate>
 		<MessageType>DR</MessageType>
 	</Header>
 	<Body>
