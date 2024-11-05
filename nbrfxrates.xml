@@ -8,45 +8,45 @@
 	<Body>
 		<Subject>Reference rates</Subject>
 		<OrigCurrency>RON</OrigCurrency>
-		<Cube date="2024-11-04">
-			<Rate currency="AED">1.2426</Rate>
-			<Rate currency="AUD">3.0087</Rate>
-			<Rate currency="BGN">2.5435</Rate>
-			<Rate currency="BRL">0.7778</Rate>
-			<Rate currency="CAD">3.2803</Rate>
-			<Rate currency="CHF">5.2853</Rate>
-			<Rate currency="CNY">0.6432</Rate>
-			<Rate currency="CZK">0.1966</Rate>
-			<Rate currency="DKK">0.6671</Rate>
+		<Cube date="2024-11-05">
+			<Rate currency="AED">1.2434</Rate>
+			<Rate currency="AUD">3.0222</Rate>
+			<Rate currency="BGN">2.5437</Rate>
+			<Rate currency="BRL">0.7885</Rate>
+			<Rate currency="CAD">3.2889</Rate>
+			<Rate currency="CHF">5.2973</Rate>
+			<Rate currency="CNY">0.6429</Rate>
+			<Rate currency="CZK">0.1964</Rate>
+			<Rate currency="DKK">0.6670</Rate>
 			<Rate currency="EGP">0.0929</Rate>
-			<Rate currency="EUR">4.9748</Rate>
-			<Rate currency="GBP">5.9164</Rate>
-			<Rate currency="HKD">0.5870</Rate>
-			<Rate currency="HUF" multiplier="100">1.2196</Rate>
+			<Rate currency="EUR">4.9750</Rate>
+			<Rate currency="GBP">5.9304</Rate>
+			<Rate currency="HKD">0.5876</Rate>
+			<Rate currency="HUF" multiplier="100">1.2142</Rate>
 			<Rate currency="IDR" multiplier="100">0.0290</Rate>
-			<Rate currency="ILS">1.2181</Rate>
+			<Rate currency="ILS">1.2182</Rate>
 			<Rate currency="INR">0.0543</Rate>
-			<Rate currency="ISK" multiplier="100">3.3410</Rate>
-			<Rate currency="JPY" multiplier="100">3.0069</Rate>
-			<Rate currency="KRW" multiplier="100">0.3320</Rate>
-			<Rate currency="MDL">0.2556</Rate>
+			<Rate currency="ISK" multiplier="100">3.3412</Rate>
+			<Rate currency="JPY" multiplier="100">2.9999</Rate>
+			<Rate currency="KRW" multiplier="100">0.3313</Rate>
+			<Rate currency="MDL">0.2548</Rate>
 			<Rate currency="MXN">0.2271</Rate>
-			<Rate currency="MYR">1.0438</Rate>
-			<Rate currency="NOK">0.4161</Rate>
-			<Rate currency="NZD">2.7312</Rate>
-			<Rate currency="PHP">0.0781</Rate>
-			<Rate currency="PLN">1.1458</Rate>
+			<Rate currency="MYR">1.0510</Rate>
+			<Rate currency="NOK">0.4164</Rate>
+			<Rate currency="NZD">2.7395</Rate>
+			<Rate currency="PHP">0.0783</Rate>
+			<Rate currency="PLN">1.1394</Rate>
 			<Rate currency="RSD">0.0425</Rate>
-			<Rate currency="RUB">0.0461</Rate>
-			<Rate currency="SEK">0.4277</Rate>
-			<Rate currency="SGD">3.4651</Rate>
-			<Rate currency="THB">0.1353</Rate>
-			<Rate currency="TRY">0.1330</Rate>
-			<Rate currency="UAH">0.1101</Rate>
-			<Rate currency="USD">4.5640</Rate>
-			<Rate currency="XAU">401.8405</Rate>
-			<Rate currency="XDR">6.0882</Rate>
-			<Rate currency="ZAR">0.2603</Rate>
+			<Rate currency="RUB">0.0466</Rate>
+			<Rate currency="SEK">0.4269</Rate>
+			<Rate currency="SGD">3.4675</Rate>
+			<Rate currency="THB">0.1359</Rate>
+			<Rate currency="TRY">0.1328</Rate>
+			<Rate currency="UAH">0.1102</Rate>
+			<Rate currency="USD">4.5669</Rate>
+			<Rate currency="XAU">402.0590</Rate>
+			<Rate currency="XDR">6.0898</Rate>
+			<Rate currency="ZAR">0.2617</Rate>
 		</Cube>
 	</Body>
 </DataSet>
