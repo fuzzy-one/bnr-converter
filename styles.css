@@ -75,6 +75,7 @@ header {
 }
 
 .currency-row {
+    position: relative;
     background: var(--card-bg);
     margin-bottom: 12px;
     padding: 16px;
@@ -82,18 +83,23 @@ header {
     display: flex;
     align-items: center;
     box-shadow: var(--shadow);
-    cursor: grab;
     transition: transform 0.2s, box-shadow 0.2s;
     border: 1px solid transparent;
+    overflow: hidden;
 }
 
 .currency-row.active {
     border-color: var(--accent-color);
-    background: rgba(var(--accent-color-rgb), 0.05);
 }
 
-.currency-row:active {
-    cursor: grabbing;
+.drag-handle {
+    cursor: grab;
+    padding: 8px;
+    color: #888;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    font-size: 1.2rem;
 }
 
 .currency-info {
@@ -108,7 +114,7 @@ header {
     border-radius: 50%;
     margin-right: 12px;
     object-fit: cover;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .currency-code {
@@ -124,6 +130,7 @@ header {
 
 .amount-container {
     text-align: right;
+    transition: transform 0.2s;
 }
 
 .amount {
@@ -135,6 +142,30 @@ header {
 .rate-info {
     font-size: 0.75rem;
     color: #888;
+}
+
+.delete-action {
+    position: absolute;
+    right: -80px;
+    top: 0;
+    bottom: 0;
+    width: 80px;
+    background: #ff4d4d;
+    color: white;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.5rem;
+    transition: right 0.2s;
+    cursor: pointer;
+}
+
+.currency-row.swiped .delete-action {
+    right: 0;
+}
+
+.currency-row.swiped .amount-container {
+    transform: translateX(-80px);
 }
 
 .add-button-row {
@@ -157,11 +188,10 @@ header {
     cursor: pointer;
 }
 
-/* Keypad Styles */
 .keypad {
     background: var(--card-bg);
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     grid-gap: 8px;
     padding: 12px;
     border-top: 1px solid var(--border-color);
@@ -170,9 +200,9 @@ header {
 .key {
     background: var(--key-bg);
     border: none;
-    padding: 18px 0;
+    padding: 14px 0;
     border-radius: 8px;
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 500;
     color: var(--key-text);
     cursor: pointer;
@@ -186,20 +216,14 @@ header {
     background: var(--key-active);
 }
 
-.key.operator {
+.key.action-clear {
+    color: #ff4d4d;
+}
+
+.key.action-back {
     color: var(--accent-color);
 }
 
-.key.action {
-    background: var(--accent-color);
-    color: white;
-}
-
-.key.action:active {
-    filter: brightness(0.9);
-}
-
-/* Modal Styles */
 .modal {
     display: none;
     position: fixed;
@@ -256,7 +280,6 @@ footer {
     color: #888;
 }
 
-/* Hide Install button by default, logic will show it */
 #installButton {
     background: var(--accent-color);
     color: white;

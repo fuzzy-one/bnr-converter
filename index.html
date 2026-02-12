@@ -36,29 +36,23 @@
     </div>
 
     <div class="keypad">
-        <button class="key" data-key="clear">C</button>
-        <button class="key operator" data-key="swap">⇄</button>
-        <button class="key operator" data-key="percent">%</button>
-        <button class="key operator" data-key="divide">÷</button>
-
         <button class="key" data-key="7">7</button>
         <button class="key" data-key="8">8</button>
         <button class="key" data-key="9">9</button>
-        <button class="key operator" data-key="multiply">×</button>
 
         <button class="key" data-key="4">4</button>
         <button class="key" data-key="5">5</button>
         <button class="key" data-key="6">6</button>
-        <button class="key operator" data-key="subtract">−</button>
 
         <button class="key" data-key="1">1</button>
         <button class="key" data-key="2">2</button>
         <button class="key" data-key="3">3</button>
-        <button class="key operator" data-key="add">+</button>
 
+        <button class="key action-clear" data-key="clear">C</button>
         <button class="key" data-key="0">0</button>
         <button class="key" data-key="dot">.</button>
-        <button class="key action" style="grid-column: span 2;" data-key="backspace">⌫</button>
+
+        <button class="key action-back" style="grid-column: span 3;" data-key="backspace">⌫</button>
     </div>
 
     <footer>
@@ -96,8 +90,8 @@
 
         let exchangeRates = { RON: 1 };
         let selectedCurrencies = JSON.parse(localStorage.getItem('selectedCurrencies')) || ['RON', 'EUR', 'USD', 'GBP'];
-        let activeCurrency = selectedCurrencies[0];
-        let currentInput = "1";
+        let activeCurrency = localStorage.getItem('activeCurrency') || selectedCurrencies[0];
+        let currentInput = localStorage.getItem('currentInput') || "1";
 
         const currencyListEl = document.getElementById('currencyList');
         const lastUpdatedEl = document.getElementById('lastUpdated');
@@ -137,28 +131,55 @@
 
         function renderList() {
             currencyListEl.innerHTML = '';
-            selectedCurrencies.forEach(code => {
+            selectedCurrencies.forEach((code, index) => {
                 const row = document.createElement('div');
                 row.className = `currency-row ${code === activeCurrency ? 'active' : ''}`;
                 row.dataset.code = code;
-                row.onclick = () => setActive(code);
 
                 const amount = convert(currentInput, activeCurrency, code);
                 const flagCode = currencyToCountry[code] || 'un';
 
                 row.innerHTML = `
-                    <div class="currency-info">
+                    <div class="drag-handle">☰</div>
+                    <div class="currency-info" onclick="setActive('${code}')">
                         <span class="flag fi fi-${flagCode}"></span>
                         <span class="currency-code">${code}</span>
                         <span class="currency-symbol">${currencySymbols[code] || ''}</span>
                     </div>
-                    <div class="amount-container">
+                    <div class="amount-container" onclick="setActive('${code}')">
                         <div class="amount">${formatNumber(amount)}</div>
                         <div class="rate-info">1 ${code} = ${formatNumber(exchangeRates['RON'] / exchangeRates[code])} RON</div>
                     </div>
+                    <div class="delete-action" onclick="deleteCurrency('${code}')">🗑</div>
                 `;
+
+                // Swipe events
+                let startX;
+                row.addEventListener('touchstart', e => startX = e.touches[0].clientX);
+                row.addEventListener('touchmove', e => {
+                    const diff = startX - e.touches[0].clientX;
+                    if (diff > 50) row.classList.add('swiped');
+                    if (diff < -50) row.classList.remove('swiped');
+                });
+
+                // Mouse swipe simulation
+                row.addEventListener('mousedown', e => startX = e.clientX);
+                row.addEventListener('mouseup', e => {
+                    const diff = startX - e.clientX;
+                    if (diff > 50) row.classList.add('swiped');
+                    if (diff < -50) row.classList.remove('swiped');
+                });
+
                 currencyListEl.appendChild(row);
             });
+        }
+
+        function deleteCurrency(code) {
+            if (selectedCurrencies.length <= 1) return;
+            selectedCurrencies = selectedCurrencies.filter(c => c !== code);
+            if (activeCurrency === code) activeCurrency = selectedCurrencies[0];
+            saveState();
+            renderList();
         }
 
         function convert(amount, from, to) {
@@ -172,15 +193,23 @@
 
         function setActive(code) {
             activeCurrency = code;
+            saveState();
             renderList();
+        }
+
+        function saveState() {
+            localStorage.setItem('selectedCurrencies', JSON.stringify(selectedCurrencies));
+            localStorage.setItem('activeCurrency', activeCurrency);
+            localStorage.setItem('currentInput', currentInput);
         }
 
         function setupSortable() {
             new Sortable(currencyListEl, {
                 animation: 150,
+                handle: '.drag-handle',
                 onEnd: () => {
                     selectedCurrencies = Array.from(currencyListEl.children).map(row => row.dataset.code);
-                    localStorage.setItem('selectedCurrencies', JSON.stringify(selectedCurrencies));
+                    saveState();
                 }
             });
         }
@@ -196,6 +225,7 @@
                         if (currentInput === "0") currentInput = k;
                         else currentInput += k;
                     }
+                    saveState();
                     renderList();
                 };
             });
@@ -206,14 +236,14 @@
             document.getElementById('openModalBtn').onclick = () => {
                 const list = document.getElementById('currencySelectList');
                 list.innerHTML = '';
-                Object.keys(exchangeRates).forEach(code => {
+                Object.keys(exchangeRates).sort().forEach(code => {
                     if (selectedCurrencies.includes(code)) return;
                     const row = document.createElement('div');
                     row.className = 'select-row';
                     row.innerHTML = `<span class="flag fi fi-${currencyToCountry[code] || 'un'}"></span> <span>${code}</span>`;
                     row.onclick = () => {
                         selectedCurrencies.push(code);
-                        localStorage.setItem('selectedCurrencies', JSON.stringify(selectedCurrencies));
+                        saveState();
                         renderList();
                         modal.style.display = 'none';
                     };
