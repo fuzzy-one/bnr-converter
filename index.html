@@ -125,7 +125,21 @@
             try {
                 const response = await fetch(lastUpdatedUrl);
                 const text = await response.text();
+                const lastUpdatedDate = new Date(text.trim());
                 lastUpdatedEl.textContent = text.trim();
+
+                // If the data is more than 2 hours old, make it red
+                const now = new Date();
+                const diffMs = now - lastUpdatedDate;
+                const twoHoursMs = 2 * 60 * 60 * 1000;
+
+                if (diffMs > twoHoursMs) {
+                    lastUpdatedEl.style.color = '#ff4d4d';
+                    lastUpdatedEl.style.fontWeight = 'bold';
+                } else {
+                    lastUpdatedEl.style.color = '';
+                    lastUpdatedEl.style.fontWeight = '';
+                }
             } catch (e) { }
         }
 
