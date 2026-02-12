@@ -1,12 +1,14 @@
-const CACHE_NAME = 'currency-converter-cache-v1';
+const CACHE_NAME = 'currency-converter-cache-v2';
 const urlsToCache = [
     '/',
     '/index.html',
     '/styles.css',
     '/manifest.json',
     '/nbrfxrates.xml',
-    '/icons/icon-192x192.png',
-    '/icons/icon-512x512.png'
+    '/last-updated.txt',
+    'https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap',
+    'https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css',
+    'https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js'
 ];
 
 // Install event - cache necessary files
@@ -34,7 +36,7 @@ self.addEventListener('fetch', (event) => {
 // Activate event - clean up old caches
 self.addEventListener('activate', (event) => {
     const cacheWhitelist = [CACHE_NAME];
-    
+
     event.waitUntil(
         caches.keys().then((cacheNames) => {
             return Promise.all(

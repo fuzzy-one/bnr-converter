@@ -1,52 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Currency Converter</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Currency Pro</title>
+    <!-- Inter Font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Flag Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/lipis/flag-icons@7.0.0/css/flag-icons.min.css">
+    <!-- SortableJS -->
+    <script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
     <link rel="stylesheet" href="styles.css">
     <link rel="manifest" href="manifest.json">
-    <style>
-        .form-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        .form-group input,
-        .form-group select {
-            margin-right: 10px;
-        }
-        #footer {
-            margin-top: 20px;
-            font-size: 14px;
-            color: #666;
-        }
-    </style>
 </head>
+
 <body>
-    <div class="container">
-        <div class="form-group">
-            <input type="number" id="fromAmount" value="1" min="0" />
-            <select id="fromCurrency">
-                <option value="RON">RON</option>
-                <option value="EUR">EUR</option>
-                <option value="USD">USD</option>
-            </select>
-        </div>
+    <header>
+        <button class="icon-button">☰</button>
+        <div>CURRENCY <span>PRO</span></div>
+        <button id="installButton" hidden>Install</button>
+        <button class="icon-button">✎</button>
+    </header>
 
-        <div class="form-group">
-            <input type="number" id="toAmount" value="" min="0" />
-            <select id="toCurrency">
-                <option value="RON">RON</option>
-                <option value="EUR">EUR</option>
-                <option value="USD">USD</option>
-            </select>
-        </div>
+    <div id="currencyList" class="currency-list">
+        <!-- Rows will be injected here -->
+    </div>
 
-        <button id="installButton" hidden>Install App</button>
+    <div class="add-button-row">
+        <button class="add-btn" id="openModalBtn">
+            <span>+</span> Add currency
+        </button>
+    </div>
 
-        <div id="footer">
-            Last updated: <span id="lastUpdated"></span>
+    <div class="keypad">
+        <button class="key" data-key="clear">C</button>
+        <button class="key operator" data-key="swap">⇄</button>
+        <button class="key operator" data-key="percent">%</button>
+        <button class="key operator" data-key="divide">÷</button>
+
+        <button class="key" data-key="7">7</button>
+        <button class="key" data-key="8">8</button>
+        <button class="key" data-key="9">9</button>
+        <button class="key operator" data-key="multiply">×</button>
+
+        <button class="key" data-key="4">4</button>
+        <button class="key" data-key="5">5</button>
+        <button class="key" data-key="6">6</button>
+        <button class="key operator" data-key="subtract">−</button>
+
+        <button class="key" data-key="1">1</button>
+        <button class="key" data-key="2">2</button>
+        <button class="key" data-key="3">3</button>
+        <button class="key operator" data-key="add">+</button>
+
+        <button class="key" data-key="0">0</button>
+        <button class="key" data-key="dot">.</button>
+        <button class="key action" style="grid-column: span 2;" data-key="backspace">⌫</button>
+    </div>
+
+    <footer>
+        Last updated: <span id="lastUpdated">...</span>
+    </footer>
+
+    <!-- Add Currency Modal -->
+    <div id="addCurrencyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add Currency</h3>
+                <button class="icon-button" id="closeModalBtn">✕</button>
+            </div>
+            <div id="currencySelectList" class="currency-select-list">
+                <!-- Selectable currencies will be here -->
+            </div>
         </div>
     </div>
 
@@ -54,152 +82,157 @@
         const xmlUrl = 'nbrfxrates.xml';
         const lastUpdatedUrl = 'last-updated.txt';
 
-        let exchangeRates = {
-            RON: 1,
-            EUR: null,
-            USD: null
+        const currencyToCountry = {
+            'RON': 'ro', 'EUR': 'eu', 'USD': 'us', 'GBP': 'gb', 'CHF': 'ch', 'JPY': 'jp',
+            'AUD': 'au', 'CAD': 'ca', 'CNY': 'cn', 'CZK': 'cz', 'DKK': 'dk', 'EGP': 'eg',
+            'HUF': 'hu', 'INR': 'in', 'ILS': 'il', 'KRW': 'kr', 'MXN': 'mx', 'NOK': 'no',
+            'NZD': 'nz', 'PLN': 'pl', 'RUB': 'ru', 'SEK': 'se', 'SGD': 'sg', 'THB': 'th',
+            'TRY': 'tr', 'UAH': 'ua', 'ZAR': 'za', 'MDL': 'md', 'BRL': 'br', 'AED': 'ae'
         };
 
-        // Fetch the exchange rates from the local XML file
+        const currencySymbols = {
+            'RON': 'L', 'EUR': '€', 'USD': '$', 'GBP': '£'
+        };
+
+        let exchangeRates = { RON: 1 };
+        let selectedCurrencies = JSON.parse(localStorage.getItem('selectedCurrencies')) || ['RON', 'EUR', 'USD', 'GBP'];
+        let activeCurrency = selectedCurrencies[0];
+        let currentInput = "1";
+
+        const currencyListEl = document.getElementById('currencyList');
+        const lastUpdatedEl = document.getElementById('lastUpdated');
+
+        async function init() {
+            await fetchExchangeRates();
+            await updateLastUpdated();
+            renderList();
+            setupSortable();
+            setupKeypad();
+            setupModal();
+        }
+
         async function fetchExchangeRates() {
             try {
                 const response = await fetch(xmlUrl);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
                 const xmlText = await response.text();
                 const parser = new DOMParser();
                 const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-
                 const rates = xmlDoc.getElementsByTagName('Rate');
                 for (let i = 0; i < rates.length; i++) {
                     const currency = rates[i].getAttribute('currency');
-                    const rateValue = parseFloat(rates[i].textContent);
-
-                    if (currency === 'EUR') {
-                        exchangeRates.EUR = rateValue;
-                    } else if (currency === 'USD') {
-                        exchangeRates.USD = rateValue;
-                    }
+                    const multiplier = parseInt(rates[i].getAttribute('multiplier') || "1");
+                    const rateValue = parseFloat(rates[i].textContent) / multiplier;
+                    exchangeRates[currency] = rateValue;
                 }
-                updateConversion(); // Update conversion when rates are fetched
-            } catch (error) {
-                console.error('Error fetching or parsing XML:', error);
-            }
+            } catch (e) { console.error("Failed to fetch rates", e); }
         }
 
-        // Convert function
-        function convertCurrency(amount, fromCurrency, toCurrency) {
-            const fromRate = exchangeRates[fromCurrency];
-            const toRate = exchangeRates[toCurrency];
-
-            if (!fromRate || !toRate) {
-                alert("Exchange rates not available. Please try again later.");
-                return null;
-            }
-            const convertedAmount = (amount * fromRate) / toRate;
-            return convertedAmount.toFixed(4);
-        }
-
-        // Update conversion based on input values
-        function updateConversion(sourceField) {
-            const fromAmount = parseFloat(document.getElementById('fromAmount').value) || 0;
-            const fromCurrency = document.getElementById('fromCurrency').value;
-            const toCurrency = document.getElementById('toCurrency').value;
-            const toAmountField = document.getElementById('toAmount');
-            const fromAmountField = document.getElementById('fromAmount');
-
-            if (sourceField === 'from') {
-                const result = convertCurrency(fromAmount, fromCurrency, toCurrency);
-                if (result !== null) {
-                    toAmountField.value = result;
-                }
-            } else if (sourceField === 'to') {
-                const toAmount = parseFloat(toAmountField.value) || 0;
-                const result = convertCurrency(toAmount, toCurrency, fromCurrency);
-                if (result !== null) {
-                    fromAmountField.value = result;
-                }
-            }
-        }
-
-        // Event listeners for real-time conversion
-        document.getElementById('fromAmount').addEventListener('input', () => updateConversion('from'));
-        document.getElementById('fromCurrency').addEventListener('change', () => updateConversion('from'));
-        document.getElementById('toCurrency').addEventListener('change', () => updateConversion('from'));
-        document.getElementById('toAmount').addEventListener('input', () => updateConversion('to'));
-
-        // Set default values
-        document.getElementById('fromCurrency').value = 'EUR';
-        document.getElementById('toCurrency').value = 'RON';
-
-        // Fetch exchange rates and last updated time on window load
-        window.onload = async function() {
-            await fetchExchangeRates();
-            updateLastUpdated();
-        };
-
-        // Fetch and display the last updated time
         async function updateLastUpdated() {
             try {
                 const response = await fetch(lastUpdatedUrl);
-                if (!response.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                const lastUpdatedText = await response.text();
-                const lastUpdatedDate = new Date(lastUpdatedText);
-                document.getElementById('lastUpdated').textContent = formatLocalDate(lastUpdatedDate);
-            } catch (error) {
-                console.error('Error fetching last updated time:', error);
-            }
+                const text = await response.text();
+                lastUpdatedEl.textContent = text.trim();
+            } catch (e) { }
         }
 
-        // Format date and time to dd-MMM-yyyy hh:mm:ss
-        function formatLocalDate(date) {
-            const day = String(date.getDate()).padStart(2, '0');
-            const month = date.toLocaleString('default', { month: 'short' }); // Short month name (e.g., Jan, Feb)
-            const year = date.getFullYear();
-            const hours = String(date.getHours()).padStart(2, '0');
-            const minutes = String(date.getMinutes()).padStart(2, '0');
-            const seconds = String(date.getSeconds()).padStart(2, '0');
-            return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
-        }
+        function renderList() {
+            currencyListEl.innerHTML = '';
+            selectedCurrencies.forEach(code => {
+                const row = document.createElement('div');
+                row.className = `currency-row ${code === activeCurrency ? 'active' : ''}`;
+                row.dataset.code = code;
+                row.onclick = () => setActive(code);
 
-        // Install PWA prompt handling
-        let deferredPrompt;
-        const installButton = document.getElementById('installButton');
+                const amount = convert(currentInput, activeCurrency, code);
+                const flagCode = currencyToCountry[code] || 'un';
 
-        window.addEventListener('beforeinstallprompt', (event) => {
-            event.preventDefault();
-            deferredPrompt = event;
-            installButton.hidden = false;
-
-            installButton.addEventListener('click', () => {
-                installButton.hidden = true;
-                deferredPrompt.prompt();
-                deferredPrompt.userChoice.then((choiceResult) => {
-                    if (choiceResult.outcome === 'accepted') {
-                        console.log('User accepted the install prompt');
-                    } else {
-                        console.log('User dismissed the install prompt');
-                    }
-                    deferredPrompt = null;
-                });
+                row.innerHTML = `
+                    <div class="currency-info">
+                        <span class="flag fi fi-${flagCode}"></span>
+                        <span class="currency-code">${code}</span>
+                        <span class="currency-symbol">${currencySymbols[code] || ''}</span>
+                    </div>
+                    <div class="amount-container">
+                        <div class="amount">${formatNumber(amount)}</div>
+                        <div class="rate-info">1 ${code} = ${formatNumber(exchangeRates['RON'] / exchangeRates[code])} RON</div>
+                    </div>
+                `;
+                currencyListEl.appendChild(row);
             });
-        });
+        }
+
+        function convert(amount, from, to) {
+            const ronValue = amount * exchangeRates[from];
+            return ronValue / exchangeRates[to];
+        }
+
+        function formatNumber(num) {
+            return parseFloat(num).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 4 });
+        }
+
+        function setActive(code) {
+            activeCurrency = code;
+            renderList();
+        }
+
+        function setupSortable() {
+            new Sortable(currencyListEl, {
+                animation: 150,
+                onEnd: () => {
+                    selectedCurrencies = Array.from(currencyListEl.children).map(row => row.dataset.code);
+                    localStorage.setItem('selectedCurrencies', JSON.stringify(selectedCurrencies));
+                }
+            });
+        }
+
+        function setupKeypad() {
+            document.querySelectorAll('.key').forEach(key => {
+                key.onclick = () => {
+                    const k = key.dataset.key;
+                    if (k === 'clear') currentInput = "0";
+                    else if (k === 'backspace') currentInput = currentInput.slice(0, -1) || "0";
+                    else if (k === 'dot') { if (!currentInput.includes('.')) currentInput += '.'; }
+                    else if (!isNaN(k)) {
+                        if (currentInput === "0") currentInput = k;
+                        else currentInput += k;
+                    }
+                    renderList();
+                };
+            });
+        }
+
+        function setupModal() {
+            const modal = document.getElementById('addCurrencyModal');
+            document.getElementById('openModalBtn').onclick = () => {
+                const list = document.getElementById('currencySelectList');
+                list.innerHTML = '';
+                Object.keys(exchangeRates).forEach(code => {
+                    if (selectedCurrencies.includes(code)) return;
+                    const row = document.createElement('div');
+                    row.className = 'select-row';
+                    row.innerHTML = `<span class="flag fi fi-${currencyToCountry[code] || 'un'}"></span> <span>${code}</span>`;
+                    row.onclick = () => {
+                        selectedCurrencies.push(code);
+                        localStorage.setItem('selectedCurrencies', JSON.stringify(selectedCurrencies));
+                        renderList();
+                        modal.style.display = 'none';
+                    };
+                    list.appendChild(row);
+                });
+                modal.style.display = 'flex';
+            };
+            document.getElementById('closeModalBtn').onclick = () => modal.style.display = 'none';
+        }
+
+        init();
     </script>
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
-                navigator.serviceWorker.register('/bnr-converter/service-worker.js')
-                    .then((registration) => {
-                        console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                    })
-                    .catch((error) => {
-                        console.log('ServiceWorker registration failed: ', error);
-                    });
+                navigator.serviceWorker.register('/bnr-converter/service-worker.js');
             });
         }
     </script>
 </body>
+
 </html>

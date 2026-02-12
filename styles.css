@@ -1,41 +1,268 @@
+:root {
+    --bg-color: #f8f9fa;
+    --card-bg: #ffffff;
+    --text-color: #212529;
+    --accent-color: #007bff;
+    --border-color: #dee2e6;
+    --shadow: 0 4px 6px rgba(0, 0, 0, 0.05), 0 1px 3px rgba(0, 0, 0, 0.1);
+    --key-bg: #f1f3f5;
+    --key-text: #495057;
+    --key-active: #e9ecef;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root {
+        --bg-color: #121212;
+        --card-bg: #1e1e1e;
+        --text-color: #e0e0e0;
+        --accent-color: #378afe;
+        --border-color: #333333;
+        --shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+        --key-bg: #2d2d2d;
+        --key-text: #e0e0e0;
+        --key-active: #404040;
+    }
+}
+
+* {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+}
+
 body {
     margin: 0;
-    font-family: Arial, sans-serif;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-color);
     display: flex;
     flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+}
+
+header {
+    padding: 16px;
+    text-align: center;
+    font-weight: 700;
+    font-size: 1.2rem;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    justify-content: center;
-    min-height: 100vh;
-    background-color: #f0f0f0;
 }
 
-.container {
-    width: 100%;
-    max-width: 360px; /* Adjust as needed */
-    height: auto; /* Ensure content height is dynamic */
-    padding: 20px;
-    background: #fff;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-    box-sizing: border-box; /* Include padding in width calculation */
-}
-
-.form-group input,
-.form-group select {
-    margin-right: 10px;
-    flex: 1; /* Ensure input and select take up available space */
-}
-
-input, select {
-    width: 100%;
+.icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-color);
+    font-size: 1.2rem;
     padding: 8px;
-    border-radius: 4px;
-    border: 1px solid #ccc;
-    font-size: 16px;
+    border-radius: 50%;
+    transition: background 0.2s;
 }
 
+.icon-button:hover {
+    background: var(--key-active);
+}
 
-#convertedAmount {
-    color: #007bff;
-    font-weight: bold;
+.currency-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    list-style: none;
+}
+
+.currency-row {
+    background: var(--card-bg);
+    margin-bottom: 12px;
+    padding: 16px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    box-shadow: var(--shadow);
+    cursor: grab;
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid transparent;
+}
+
+.currency-row.active {
+    border-color: var(--accent-color);
+    background: rgba(var(--accent-color-rgb), 0.05);
+}
+
+.currency-row:active {
+    cursor: grabbing;
+}
+
+.currency-info {
+    display: flex;
+    align-items: center;
+    flex: 1;
+}
+
+.flag {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    margin-right: 12px;
+    object-fit: cover;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.currency-code {
+    font-weight: 600;
+    font-size: 1.1rem;
+    margin-right: 4px;
+}
+
+.currency-symbol {
+    color: #888;
+    font-size: 0.9rem;
+}
+
+.amount-container {
+    text-align: right;
+}
+
+.amount {
+    font-size: 1.2rem;
+    font-weight: 500;
+    margin-bottom: 2px;
+}
+
+.rate-info {
+    font-size: 0.75rem;
+    color: #888;
+}
+
+.add-button-row {
+    display: flex;
+    justify-content: center;
+    padding: 12px;
+}
+
+.add-btn {
+    background: var(--key-bg);
+    border: none;
+    color: var(--text-color);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+/* Keypad Styles */
+.keypad {
+    background: var(--card-bg);
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--border-color);
+}
+
+.key {
+    background: var(--key-bg);
+    border: none;
+    padding: 18px 0;
+    border-radius: 8px;
+    font-size: 1.4rem;
+    font-weight: 500;
+    color: var(--key-text);
+    cursor: pointer;
+    transition: background 0.1s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.key:active {
+    background: var(--key-active);
+}
+
+.key.operator {
+    color: var(--accent-color);
+}
+
+.key.action {
+    background: var(--accent-color);
+    color: white;
+}
+
+.key.action:active {
+    filter: brightness(0.9);
+}
+
+/* Modal Styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: flex-end;
+}
+
+.modal-content {
+    background: var(--card-bg);
+    width: 100%;
+    max-height: 80%;
+    border-top-left-radius: 20px;
+    border-top-right-radius: 20px;
+    overflow-y: auto;
+    padding: 24px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.currency-select-list {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.select-row {
+    padding: 12px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    transition: background 0.2s;
+}
+
+.select-row:hover {
+    background: var(--key-bg);
+}
+
+footer {
+    padding: 8px;
+    text-align: center;
+    font-size: 0.7rem;
+    color: #888;
+}
+
+/* Hide Install button by default, logic will show it */
+#installButton {
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    cursor: pointer;
 }
