@@ -14,7 +14,7 @@ jobs:
 
       - name: Fetch latest XML data
         run: |
-          curl -o nbrfxrates.xml https://www.bnr.ro/nbrfxrates.xml
+          curl -o nbrfxrates.xml https://curs.bnr.ro/nbrfxrates.xml
           TZ='Europe/Bucharest' date > last-updated.txt
 
       - name: Commit and push changes
